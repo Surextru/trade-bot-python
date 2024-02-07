@@ -115,3 +115,54 @@ class Indicators():
         )
 
         return self._frame
+    
+    def sma (self, period: int) -> pd.DataFrame:
+        locals_data = locals()
+        del locals_data['self']
+
+        column_name = 'sma'
+        self._current_indicators[column_name] = {}
+        self._current_indicators[column_name]['args'] = locals_data
+        self._current_indicators[column_name]['func'] = self.sma
+
+        self._frame[column_name] = self._price_groups['close'].transform(
+            lambda x: x.rolling(window=period).mean()
+        )
+
+        return self._frame
+    
+    def ema(self, period: int, alpha: float = 0.0) -> pd.DataFrame:
+        locals_data = locals()
+        del locals_data['self']
+
+        column_name = 'ema'
+        self._current_indicators[column_name] = {}
+        self._current_indicators[column_name]['args'] = locals_data
+        self._current_indicators[column_name]['func'] = self.ema
+
+        self._frame[column_name] = self._price_groups['close'].transform(
+            lambda x: x.rolling(span=period).mean()
+        )
+
+        return self._frame
+    
+    def refresh(self):
+
+        #first update the groups
+        self._price_groups = self._stock_framne.symbol_groups
+
+        #loop through all the store indicators
+        for indicator in self._current_indicators:
+
+            indicator_arguments = self._current_indicator[indicator]['args']
+            indicator_function = self._current_indicator[indicator]['func']
+
+            # Update the columns
+            # indicator_function(**indicator_arguments)
+
+    
+    def check_signals(self) -> Union[pd.DataFrame, None]:
+
+        signals_df = self._stock_frame._check_signals(indicators=self._indicatos_signals)
+
+        return signals_df   
